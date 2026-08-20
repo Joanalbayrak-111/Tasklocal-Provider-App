@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TaskLocal — Provider App</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 480px;
+    margin: 60px auto;
+    padding: 0 20px;
+    color: #222;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  p.subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+  label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; margin-top: 14px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { background: #333; }
+  #result { margin-top: 16px; }
+  .success { background: #e6f4ea; border: 1px solid #b7ddc0; border-radius: 6px; padding: 12px; }
+  .error { background: #fdecea; border: 1px solid #f4b8b3; border-radius: 6px; padding: 12px; }
+  .success p, .error p { margin: 0 0 6px; font-weight: 600; font-size: 13px; }
+  .success p { color: #1e7b34; }
+  .error p { color: #c0392b; }
+  .error ul { margin: 0; padding-left: 18px; font-size: 13px; color: #c0392b; }
+  pre { font-size: 12px; white-space: pre-wrap; margin: 0; color: #1e7b34; }
+</style>
+</head>
+<body>
+  <h1>TaskLocal — Provider App</h1>
+  <p class="subtitle">Create a new service listing</p>
+
+  <label for="service_type">Service category</label>
+  <select id="service_type">
+    <option value="">Select a category</option>
+    <option value="cleaning">Cleaning</option>
+    <option value="handyman">Handyman</option>
+    <option value="moving">Moving</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <label for="title">Title</label>
+  <input id="title" type="text" placeholder="Deep apartment cleaning" />
+
+  <label for="description">Description</label>
+  <textarea id="description" rows="2" placeholder="Full clean including kitchen and bathrooms"></textarea>
+
+  <label for="hourly_rate">Hourly rate ($)</label>
+  <input id="hourly_rate" type="number" step="0.01" placeholder="45.00" />
+
+  <label for="avail_date">Availability (date)</label>
+  <input id="avail_date" type="date" />
+
+  <label for="provider_id">Provider ID</label>
+  <input id="provider_id" type="text" value="prov_88301" />
+
+  <button id="submit_btn">Create listing</button>
+  <div id="result"></div>
+
+<script>
+const SERVICE_CATEGORIES = ["cleaning", "handyman", "moving", "custom"];
+
+function randomDigits(n) {
+  let out = "";
+  for (let i = 0; i < n; i++) out += Math.floor(Math.random() * 10);
+  return out;
+}
+
+function validate(formData, providerId) {
+  const errors = [];
+  if (!SERVICE_CATEGORIES.includes(formData.service_type)) {
+    errors.push("Invalid service_type. Must be one of: " + SERVICE_CATEGORIES.join(", "));
+  }
+  if (!formData.title || formData.title.trim().length === 0) {
+    errors.push("Title is required");
+  }
+  if (typeof formData.hourly_rate !== "number" || isNaN(formData.hourly_rate) || formData.hourly_rate <= 0) {
+    errors.push("hourly_rate must be a positive number");
+  }
+  if (!Array.isArray(formData.availability_slots) || formData.availability_slots.length === 0) {
+    errors.push("At least one availability slot is required");
+  }
+  const providerPattern = /^prov_\d{5}$/;
+  if (!providerPattern.test(providerId)) {
+    errors.push('provider_id must match format prov_XXXXX (5 digits), got: "' + providerId + '"');
+  }
+  return errors;
+}
+
+document.getElementById("submit_btn").addEventListener("click", function () {
+  const resultEl = document.getElementById("result");
+  const service_type = document.getElementById("service_type").value;
+  const title = document.getElementById("title").value;
+  const description = document.getElementById("description").value;
+  const rateRaw = document.getElementById("hourly_rate").value;
+  const hourly_rate = rateRaw === "" ? NaN : parseFloat(rateRaw);
+  const avail_date = document.getElementById("avail_date").value;
+  const provider_id = document.getElementById("provider_id").value;
+
+  const availability_slots = avail_date ? [avail_date + "T09:00:00Z"] : [];
+
+  const formData = { service_type, title, description, hourly_rate, availability_slots };
+  const errors = validate(formData, provider_id);
+
+  if (errors.length > 0) {
+    resultEl.innerHTML =
+      '<div class="error"><p>Validation failed</p><ul>' +
+      errors.map(function (e) { return "<li>" + e + "</li>"; }).join("") +
+      "</ul></div>";
+  } else {
+    const listing = {
+      listing_id: "lst_" + randomDigits(6),
+      provider_id: provider_id,
+      title: title.trim(),
+      service_type: service_type,
+      description: description.trim(),
+      hourly_rate: Math.round(hourly_rate * 100) / 100,
+      availability_slots: availability_slots,
+    };
+    resultEl.innerHTML =
+      '<div class="success"><p>Listing created</p><pre>' +
+      JSON.stringify(listing, null, 2) +
+      "</pre></div>";
+  }
+});
+</script>
+</body>
+</html>
