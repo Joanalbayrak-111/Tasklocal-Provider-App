@@ -3,147 +3,110 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TaskLocal — Provider App</title>
+<title>TaskLocal | Provider workspace</title>
 <style>
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    max-width: 480px;
-    margin: 60px auto;
-    padding: 0 20px;
-    color: #222;
-  }
-  h1 { font-size: 22px; margin-bottom: 4px; }
-  p.subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
-  label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; margin-top: 14px; }
-  input, select, textarea {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
-    font-family: inherit;
-  }
-  textarea { resize: vertical; }
-  button {
-    margin-top: 20px;
-    width: 100%;
-    padding: 10px;
-    background: #111;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  button:hover { background: #333; }
-  #result { margin-top: 16px; }
-  .success { background: #e6f4ea; border: 1px solid #b7ddc0; border-radius: 6px; padding: 12px; }
-  .error { background: #fdecea; border: 1px solid #f4b8b3; border-radius: 6px; padding: 12px; }
-  .success p, .error p { margin: 0 0 6px; font-weight: 600; font-size: 13px; }
-  .success p { color: #1e7b34; }
-  .error p { color: #c0392b; }
-  .error ul { margin: 0; padding-left: 18px; font-size: 13px; color: #c0392b; }
-  pre { font-size: 12px; white-space: pre-wrap; margin: 0; color: #1e7b34; }
+  :root { --ink: #17211b; --muted: #6d776f; --paper: #f7f8f3; --line: #dfe5dc; --green: #276749; --mint: #dcefe2; --orange: #d97745; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 Georgia, serif; }
+  button, input, select, textarea { font: inherit; }
+  .app { display: flex; min-height: 100vh; }
+  aside { width: 245px; padding: 32px 22px; background: #173b2b; color: #f4f7ee; }
+  .brand { margin: 0 0 48px; font: 700 25px/1.1 Georgia, serif; letter-spacing: -.5px; }
+  .brand span { display: block; margin-top: 7px; color: #a7d6b4; font: 12px Arial, sans-serif; letter-spacing: 1.7px; text-transform: uppercase; }
+  nav button { display: block; width: 100%; padding: 11px 12px; border: 0; border-radius: 3px; color: #d6e8da; background: transparent; text-align: left; cursor: pointer; }
+  nav button.active, nav button:hover { color: #173b2b; background: #d9efdf; }
+  .profile { position: absolute; bottom: 28px; font: 13px Arial, sans-serif; color: #b9d2be; }
+  .profile strong { display: block; margin-bottom: 3px; color: white; }
+  main { width: min(900px, 100%); padding: 56px clamp(24px, 6vw, 76px); }
+  .eyebrow { margin: 0 0 8px; color: var(--orange); font: 700 11px Arial, sans-serif; letter-spacing: 1.7px; text-transform: uppercase; }
+  h1 { margin: 0; font-size: clamp(30px, 4vw, 43px); line-height: 1.1; letter-spacing: -1px; }
+  .intro { margin: 10px 0 35px; color: var(--muted); }
+  .view { display: none; animation: arrive .25s ease-out; }
+  .view.visible { display: block; }
+  @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  .listing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .listing, .booking { padding: 21px; border: 1px solid var(--line); background: white; }
+  .listing h2, .booking h2 { margin: 8px 0 14px; font-size: 20px; }
+  .tag { display: inline-block; color: var(--green); font: 700 10px Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .rate { margin: 0; font: 700 22px Arial, sans-serif; }
+  .rate small { color: var(--muted); font-size: 12px; font-weight: 400; }
+  .status { float: right; padding: 4px 7px; color: var(--green); background: var(--mint); font: 700 10px Arial, sans-serif; text-transform: uppercase; }
+  .empty { padding: 36px; border: 1px dashed #b9c6b9; color: var(--muted); text-align: center; background: white; }
+  form { max-width: 650px; padding: 26px; border: 1px solid var(--line); background: white; }
+  .field { margin-bottom: 20px; }
+  label { display: block; margin-bottom: 7px; font: 700 12px Arial, sans-serif; }
+  input, select, textarea { width: 100%; padding: 11px 12px; border: 1px solid #cbd6ca; border-radius: 2px; color: var(--ink); background: #fcfdf9; }
+  textarea { min-height: 100px; resize: vertical; }
+  .availability-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
+  .secondary, .primary { padding: 11px 16px; border: 0; border-radius: 2px; cursor: pointer; }
+  .primary { color: white; background: var(--green); }
+  .secondary { margin-top: 8px; color: var(--green); background: var(--mint); }
+  .availability-row .secondary { margin: 0; padding: 0 13px; font-size: 20px; }
+  .form-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 27px; }
+  .form-actions .primary { padding-inline: 25px; }
+  .error-box { margin-bottom: 20px; padding: 12px 15px; border-left: 3px solid #c2412d; color: #963523; background: #fff1ed; }
+  .error-box ul { margin: 0; padding-left: 18px; }
+  .success-box { margin-top: 17px; padding: 13px 15px; color: var(--green); background: var(--mint); }
+  .booking-list { display: grid; gap: 12px; }
+  .booking { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .booking h2 { margin: 3px 0; }
+  .booking p { margin: 0; color: var(--muted); }
+  .booking-actions { flex-shrink: 0; display: flex; gap: 8px; }
+  .booking-actions button { margin: 0; }
+  .decline { color: #963523; background: #fff1ed; }
+  @media (max-width: 650px) { .app { display: block; } aside { width: 100%; padding: 20px 22px; } .brand { margin: 0 0 20px; } nav { display: flex; gap: 4px; } nav button { text-align: center; } .profile { display: none; } main { padding: 34px 20px; } .booking { align-items: flex-start; flex-direction: column; } }
 </style>
 </head>
 <body>
-  <h1>TaskLocal — Provider App</h1>
-  <p class="subtitle">Create a new service listing</p>
-
-  <label for="service_type">Service category</label>
-  <select id="service_type">
-    <option value="">Select a category</option>
-    <option value="cleaning">Cleaning</option>
-    <option value="handyman">Handyman</option>
-    <option value="moving">Moving</option>
-    <option value="custom">Custom</option>
-  </select>
-
-  <label for="title">Title</label>
-  <input id="title" type="text" placeholder="Deep apartment cleaning" />
-
-  <label for="description">Description</label>
-  <textarea id="description" rows="2" placeholder="Full clean including kitchen and bathrooms"></textarea>
-
-  <label for="hourly_rate">Hourly rate ($)</label>
-  <input id="hourly_rate" type="number" step="0.01" placeholder="45.00" />
-
-  <label for="avail_date">Availability (date)</label>
-  <input id="avail_date" type="date" />
-
-  <label for="provider_id">Provider ID</label>
-  <input id="provider_id" type="text" value="prov_88301" />
-
-  <button id="submit_btn">Create listing</button>
-  <div id="result"></div>
-
+<div class="app">
+  <aside>
+    <p class="brand">TaskLocal<span>Provider workspace</span></p>
+    <nav aria-label="Main navigation">
+      <button class="active" data-view="listings">My Listings</button>
+      <button data-view="create">Create Listing</button>
+      <button data-view="bookings">Bookings <span id="pending-count"></span></button>
+    </nav>
+    <p class="profile"><strong>Alex Morgan</strong>Independent provider</p>
+  </aside>
+  <main>
+    <section id="listings-view" class="view visible">
+      <p class="eyebrow">Your services</p><h1>My Listings</h1><p class="intro">Keep your services clear, current, and easy to book.</p>
+      <div id="listing-grid" class="listing-grid"></div>
+    </section>
+    <section id="create-view" class="view">
+      <p class="eyebrow">Add a service</p><h1>Create Listing</h1><p class="intro">Tell customers what you do best.</p>
+      <form id="listing-form" novalidate>
+        <div id="form-errors" class="error-box" hidden><strong>Check the following:</strong><ul></ul></div>
+        <div class="field"><label for="service_type">Service category</label><select id="service_type"><option value="">Select a category</option><option value="cleaning">Cleaning</option><option value="handyman">Handyman</option><option value="moving">Moving</option><option value="custom">Custom</option></select></div>
+        <div class="field"><label for="title">Title</label><input id="title" type="text" placeholder="Deep apartment cleaning" /></div>
+        <div class="field"><label for="description">Description</label><textarea id="description" placeholder="What will customers get?"></textarea></div>
+        <div class="field"><label for="hourly_rate">Hourly rate</label><input id="hourly_rate" type="number" min="0.01" step="0.01" placeholder="45.00" /></div>
+        <div class="field"><label>Availability</label><div id="availability-list"><div class="availability-row"><input class="avail-date" type="date" aria-label="Availability date" /><input class="avail-time" type="time" aria-label="Availability time" /><button class="secondary remove-slot" type="button" aria-label="Remove availability">-</button></div></div><button id="add-slot" class="secondary" type="button">+ Add another time</button></div>
+        <div class="form-actions"><span id="success-message" class="success-box" hidden>Listing created successfully.</span><button class="primary" type="submit">Create listing</button></div>
+      </form>
+    </section>
+    <section id="bookings-view" class="view">
+      <p class="eyebrow">Customer requests</p><h1>Bookings</h1><p class="intro">Review and respond to requests for your services.</p><div id="booking-list" class="booking-list"></div>
+    </section>
+  </main>
+</div>
 <script>
 const SERVICE_CATEGORIES = ["cleaning", "handyman", "moving", "custom"];
-
-function randomDigits(n) {
-  let out = "";
-  for (let i = 0; i < n; i++) out += Math.floor(Math.random() * 10);
-  return out;
-}
-
-function validate(formData, providerId) {
-  const errors = [];
-  if (!SERVICE_CATEGORIES.includes(formData.service_type)) {
-    errors.push("Invalid service_type. Must be one of: " + SERVICE_CATEGORIES.join(", "));
-  }
-  if (!formData.title || formData.title.trim().length === 0) {
-    errors.push("Title is required");
-  }
-  if (typeof formData.hourly_rate !== "number" || isNaN(formData.hourly_rate) || formData.hourly_rate <= 0) {
-    errors.push("hourly_rate must be a positive number");
-  }
-  if (!Array.isArray(formData.availability_slots) || formData.availability_slots.length === 0) {
-    errors.push("At least one availability slot is required");
-  }
-  const providerPattern = /^prov_\d{5}$/;
-  if (!providerPattern.test(providerId)) {
-    errors.push('provider_id must match format prov_XXXXX (5 digits), got: "' + providerId + '"');
-  }
-  return errors;
-}
-
-document.getElementById("submit_btn").addEventListener("click", function () {
-  const resultEl = document.getElementById("result");
-  const service_type = document.getElementById("service_type").value;
-  const title = document.getElementById("title").value;
-  const description = document.getElementById("description").value;
-  const rateRaw = document.getElementById("hourly_rate").value;
-  const hourly_rate = rateRaw === "" ? NaN : parseFloat(rateRaw);
-  const avail_date = document.getElementById("avail_date").value;
-  const provider_id = document.getElementById("provider_id").value;
-
-  const availability_slots = avail_date ? [avail_date + "T09:00:00Z"] : [];
-
-  const formData = { service_type, title, description, hourly_rate, availability_slots };
-  const errors = validate(formData, provider_id);
-
-  if (errors.length > 0) {
-    resultEl.innerHTML =
-      '<div class="error"><p>Validation failed</p><ul>' +
-      errors.map(function (e) { return "<li>" + e + "</li>"; }).join("") +
-      "</ul></div>";
-  } else {
-    const listing = {
-      listing_id: "lst_" + randomDigits(6),
-      provider_id: provider_id,
-      title: title.trim(),
-      service_type: service_type,
-      description: description.trim(),
-      hourly_rate: Math.round(hourly_rate * 100) / 100,
-      availability_slots: availability_slots,
-    };
-    resultEl.innerHTML =
-      '<div class="success"><p>Listing created</p><pre>' +
-      JSON.stringify(listing, null, 2) +
-      "</pre></div>";
-  }
-});
+const PROVIDER_ID = "prov_88301";
+let listings = [{ listing_id: "lst_482913", provider_id: PROVIDER_ID, title: "Deep Apartment Cleaning", service_type: "cleaning", description: "A detailed reset for kitchens, bathrooms, and living spaces.", hourly_rate: 45, availability_slots: ["2026-08-20T09:00:00Z"] }];
+let bookings = [{ booking_id: "bkg_10932", title: "Move-out clean", customer: "Jamie R.", booking_status: "pending", date: "Aug 28, 2026" }, { booking_id: "bkg_10918", title: "Kitchen cabinet repair", customer: "Priya S.", booking_status: "confirmed", date: "Aug 26, 2026" }, { booking_id: "bkg_10877", title: "Two-bedroom move", customer: "Chris T.", booking_status: "completed", date: "Aug 18, 2026" }];
+function randomDigits(count) { return Array.from({ length: count }, () => Math.floor(Math.random() * 10)).join(""); }
+function showView(name) { document.querySelectorAll(".view").forEach((view) => view.classList.toggle("visible", view.id === name + "-view")); document.querySelectorAll("nav button").forEach((button) => button.classList.toggle("active", button.dataset.view === name)); }
+function renderListings() { const grid = document.getElementById("listing-grid"); grid.innerHTML = listings.length ? listings.map((listing) => `<article class="listing"><span class="tag">${listing.service_type}</span><span class="status">Active</span><h2>${listing.title}</h2><p class="rate">$${listing.hourly_rate.toFixed(2)} <small>/ hour</small></p></article>`).join("") : '<div class="empty">You have no listings yet.</div>'; }
+function renderBookings() { document.getElementById("pending-count").textContent = bookings.filter((booking) => booking.booking_status === "pending").length || ""; document.getElementById("booking-list").innerHTML = bookings.map((booking) => `<article class="booking"><div><span class="tag">${booking.booking_status}</span><h2>${booking.title}</h2><p>${booking.customer} · ${booking.date}</p></div>${booking.booking_status === "pending" ? `<div class="booking-actions"><button class="primary" data-action="confirm" data-id="${booking.booking_id}">Accept</button><button class="secondary decline" data-action="decline" data-id="${booking.booking_id}">Decline</button></div>` : ""}</article>`).join(""); }
+function getSlots() { return [...document.querySelectorAll(".availability-row")].map((row) => { const date = row.querySelector(".avail-date").value; const time = row.querySelector(".avail-time").value; return date && time ? `${date}T${time}:00Z` : ""; }).filter(Boolean); }
+function validate(data) { const errors = []; if (!SERVICE_CATEGORIES.includes(data.service_type)) errors.push("Choose cleaning, handyman, moving, or custom."); if (!data.title.trim()) errors.push("Title is required."); if (!Number.isFinite(data.hourly_rate) || data.hourly_rate <= 0) errors.push("Hourly rate must be a positive number."); if (!data.availability_slots.length) errors.push("Add at least one availability date and time."); return errors; }
+document.querySelectorAll("nav button").forEach((button) => button.addEventListener("click", () => showView(button.dataset.view)));
+document.getElementById("add-slot").addEventListener("click", () => { const row = document.querySelector(".availability-row").cloneNode(true); row.querySelectorAll("input").forEach((input) => { input.value = ""; }); document.getElementById("availability-list").appendChild(row); });
+document.getElementById("availability-list").addEventListener("click", (event) => { if (event.target.classList.contains("remove-slot") && document.querySelectorAll(".availability-row").length > 1) event.target.closest(".availability-row").remove(); });
+document.getElementById("listing-form").addEventListener("submit", (event) => { event.preventDefault(); const data = { service_type: document.getElementById("service_type").value, title: document.getElementById("title").value, description: document.getElementById("description").value, hourly_rate: Number(document.getElementById("hourly_rate").value), availability_slots: getSlots() }; const errors = validate(data); const errorBox = document.getElementById("form-errors"); errorBox.querySelector("ul").innerHTML = errors.map((error) => `<li>${error}</li>`).join(""); errorBox.hidden = !errors.length; document.getElementById("success-message").hidden = true; if (errors.length) return; const listing = { listing_id: `lst_${randomDigits(6)}`, provider_id: PROVIDER_ID, title: data.title.trim(), service_type: data.service_type, description: data.description.trim(), hourly_rate: Number(data.hourly_rate.toFixed(2)), availability_slots: data.availability_slots }; listings.push(listing); renderListings(); document.getElementById("success-message").hidden = false; event.target.reset(); showView("listings"); });
+document.getElementById("booking-list").addEventListener("click", (event) => { const action = event.target.dataset.action; if (!action) return; const bookingId = event.target.dataset.id; if (action === "confirm") bookings.find((booking) => booking.booking_id === bookingId).booking_status = "confirmed"; else bookings = bookings.filter((booking) => booking.booking_id !== bookingId); renderBookings(); });
+renderListings(); renderBookings();
 </script>
 </body>
 </html>
