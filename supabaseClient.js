@@ -1,0 +1,1 @@
+const { createClient } = require('@supabase/supabase-js'); const supabase = createClient( 'https://bikimbnqtvbqzprfgzfj.supabase.co', 'sb_publishable_C5VQy9h0OV5LSSCsKqoneQ_R3RaN59S' ); module.exports = { supabase };
