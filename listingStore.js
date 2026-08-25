@@ -1,0 +1,1 @@
+let listings = []; function saveListing(listing) { listings.push(listing); return listing; } function getListings(providerId) { if (!providerId) return [...listings]; return listings.filter((l) => l.provider_id === providerId); } function clearListings() { listings = []; } module.exports = { saveListing, getListings, clearListings };
