@@ -4,63 +4,72 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TaskLocal | Provider workspace</title>
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
 <style>
-  :root { --ink: #17211b; --muted: #6d776f; --paper: #f7f8f3; --line: #dfe5dc; --green: #276749; --mint: #dcefe2; --orange: #d97745; }
+  :root { --ink: #1f2320; --muted: #52564f; --paper: #faf9f7; --surface: #ffffff; --line: #e4e1db; --green: #2f6b4f; --green-dark: #244f3b; --mint: #e7f0ea; --orange: #d9714a; --yellow: #fff2d9; --blue: #dcecff; --blue-ink: #17509c; --success: #e2f4e5; --success-ink: #1f7a34; --danger: #b3261e; --radius: 10px; }
   * { box-sizing: border-box; }
-  body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 Georgia, serif; }
+  body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
   button, input, select, textarea { font: inherit; }
   .app { display: flex; min-height: 100vh; }
-  aside { width: 245px; padding: 32px 22px; background: #173b2b; color: #f4f7ee; }
-  .brand { margin: 0 0 48px; font: 700 25px/1.1 Georgia, serif; letter-spacing: -.5px; }
-  .brand span { display: block; margin-top: 7px; color: #a7d6b4; font: 12px Arial, sans-serif; letter-spacing: 1.7px; text-transform: uppercase; }
-  nav button { display: block; width: 100%; padding: 11px 12px; border: 0; border-radius: 3px; color: #d6e8da; background: transparent; text-align: left; cursor: pointer; }
-  nav button.active, nav button:hover { color: #173b2b; background: #d9efdf; }
-  .profile { position: absolute; bottom: 28px; font: 13px Arial, sans-serif; color: #b9d2be; }
+  aside { position: relative; width: 255px; padding: 28px 20px; background: var(--green); color: #fff; }
+  .brand { display: flex; align-items: center; gap: 10px; margin: 0 0 48px; font-size: 18px; font-weight: 700; }
+  .brand img { width: 42px; height: 42px; border-radius: 8px; background: #f7f1e3; }
+  .brand-copy { display: block; }
+  .brand span { display: block; margin-top: 3px; color: #c8ded0; font-size: 11px; font-weight: 500; letter-spacing: .4px; }
+  nav { display: grid; gap: 5px; }
+  nav button { display: block; width: 100%; padding: 11px 12px; border: 0; border-radius: 8px; color: #e1eee6; background: transparent; text-align: left; cursor: pointer; }
+  nav button.active, nav button:hover { color: #244f3b; background: #e7f0ea; }
+  .profile { position: absolute; right: 20px; bottom: 28px; left: 20px; color: #c8ded0; font-size: 13px; }
   .profile strong { display: block; margin-bottom: 3px; color: white; }
-  main { width: min(900px, 100%); padding: 56px clamp(24px, 6vw, 76px); }
-  .eyebrow { margin: 0 0 8px; color: var(--orange); font: 700 11px Arial, sans-serif; letter-spacing: 1.7px; text-transform: uppercase; }
-  h1 { margin: 0; font-size: clamp(30px, 4vw, 43px); line-height: 1.1; letter-spacing: -1px; }
+  main { width: min(960px, 100%); padding: 52px clamp(24px, 6vw, 76px); }
+  .eyebrow { margin: 0 0 8px; color: var(--orange); font-size: 11px; font-weight: 700; letter-spacing: 1.7px; text-transform: uppercase; }
+  h1 { margin: 0; font-size: clamp(30px, 4vw, 42px); line-height: 1.1; }
   .intro { margin: 10px 0 35px; color: var(--muted); }
   .view { display: none; animation: arrive .25s ease-out; }
   .view.visible { display: block; }
   @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
   .listing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-  .listing, .booking { padding: 21px; border: 1px solid var(--line); background: white; }
+  .listing, .booking { padding: 21px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
   .listing h2, .booking h2 { margin: 8px 0 14px; font-size: 20px; }
-  .tag { display: inline-block; color: var(--green); font: 700 10px Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
-  .rate { margin: 0; font: 700 22px Arial, sans-serif; }
+  .tag { display: inline-block; padding: 3px 8px; border-radius: 999px; color: var(--green-dark); background: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .rate { margin: 0; font-size: 22px; font-weight: 700; }
   .rate small { color: var(--muted); font-size: 12px; font-weight: 400; }
-  .status { float: right; padding: 4px 7px; color: var(--green); background: var(--mint); font: 700 10px Arial, sans-serif; text-transform: uppercase; }
-  .empty { padding: 36px; border: 1px dashed #b9c6b9; color: var(--muted); text-align: center; background: white; }
-  form { max-width: 650px; padding: 26px; border: 1px solid var(--line); background: white; }
+  .status { float: right; padding: 3px 8px; border-radius: 999px; color: var(--success-ink); background: var(--success); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .empty { padding: 36px; border: 1px dashed #b9c6b9; border-radius: var(--radius); color: var(--muted); text-align: center; background: var(--surface); }
+  form { max-width: 650px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
   .field { margin-bottom: 20px; }
-  label { display: block; margin-bottom: 7px; font: 700 12px Arial, sans-serif; }
-  input, select, textarea { width: 100%; padding: 11px 12px; border: 1px solid #cbd6ca; border-radius: 2px; color: var(--ink); background: #fcfdf9; }
+  label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 600; }
+  input, select, textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface); }
+  input:focus, select:focus, textarea:focus, button:focus { outline: 2px solid var(--green); outline-offset: 1px; }
   textarea { min-height: 100px; resize: vertical; }
   .availability-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
-  .secondary, .primary { padding: 11px 16px; border: 0; border-radius: 2px; cursor: pointer; }
-  .primary { color: white; background: var(--green); }
-  .secondary { margin-top: 8px; color: var(--green); background: var(--mint); }
+  .secondary, .primary { padding: 11px 16px; border: 0; border-radius: 8px; cursor: pointer; }
+  .primary { color: white; background: var(--green); font-weight: 600; }
+  .primary:hover { background: var(--green-dark); }
+  .secondary { margin-top: 8px; color: var(--green-dark); background: var(--mint); }
   .availability-row .secondary { margin: 0; padding: 0 13px; font-size: 20px; }
   .form-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 27px; }
   .form-actions .primary { padding-inline: 25px; }
-  .error-box { margin-bottom: 20px; padding: 12px 15px; border-left: 3px solid #c2412d; color: #963523; background: #fff1ed; }
+  .error-box { margin-bottom: 20px; padding: 12px 15px; border-left: 3px solid var(--danger); border-radius: 4px; color: var(--danger); background: #fff1ed; }
   .error-box ul { margin: 0; padding-left: 18px; }
-  .success-box { margin-top: 17px; padding: 13px 15px; color: var(--green); background: var(--mint); }
+  .success-box { margin-top: 17px; padding: 13px 15px; border-radius: 8px; color: var(--success-ink); background: var(--success); }
   .booking-list { display: grid; gap: 12px; }
   .booking { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
   .booking h2 { margin: 3px 0; }
   .booking p { margin: 0; color: var(--muted); }
   .booking-actions { flex-shrink: 0; display: flex; gap: 8px; }
   .booking-actions button { margin: 0; }
-  .decline { color: #963523; background: #fff1ed; }
+  .decline { color: var(--danger); background: #fff1ed; }
+  .status-pending { color: #8a5a00; background: var(--yellow); }
+  .status-confirmed { color: var(--blue-ink); background: var(--blue); }
+  .status-completed { color: var(--success-ink); background: var(--success); }
   @media (max-width: 650px) { .app { display: block; } aside { width: 100%; padding: 20px 22px; } .brand { margin: 0 0 20px; } nav { display: flex; gap: 4px; } nav button { text-align: center; } .profile { display: none; } main { padding: 34px 20px; } .booking { align-items: flex-start; flex-direction: column; } }
 </style>
 </head>
 <body>
 <div class="app">
   <aside>
-    <p class="brand">TaskLocal<span>Provider workspace</span></p>
+    <p class="brand"><img src="assets/logo.svg" alt="" /><span class="brand-copy">TaskLocal<span>Provider workspace</span></span></p>
     <nav aria-label="Main navigation">
       <button class="active" data-view="listings">My Listings</button>
       <button data-view="create">Create Listing</button>
@@ -98,7 +107,7 @@ let bookings = [{ booking_id: "bkg_10932", title: "Move-out clean", customer: "J
 function randomDigits(count) { return Array.from({ length: count }, () => Math.floor(Math.random() * 10)).join(""); }
 function showView(name) { document.querySelectorAll(".view").forEach((view) => view.classList.toggle("visible", view.id === name + "-view")); document.querySelectorAll("nav button").forEach((button) => button.classList.toggle("active", button.dataset.view === name)); }
 function renderListings() { const grid = document.getElementById("listing-grid"); grid.innerHTML = listings.length ? listings.map((listing) => `<article class="listing"><span class="tag">${listing.service_type}</span><span class="status">Active</span><h2>${listing.title}</h2><p class="rate">$${listing.hourly_rate.toFixed(2)} <small>/ hour</small></p></article>`).join("") : '<div class="empty">You have no listings yet.</div>'; }
-function renderBookings() { document.getElementById("pending-count").textContent = bookings.filter((booking) => booking.booking_status === "pending").length || ""; document.getElementById("booking-list").innerHTML = bookings.map((booking) => `<article class="booking"><div><span class="tag">${booking.booking_status}</span><h2>${booking.title}</h2><p>${booking.customer} · ${booking.date}</p></div>${booking.booking_status === "pending" ? `<div class="booking-actions"><button class="primary" data-action="confirm" data-id="${booking.booking_id}">Accept</button><button class="secondary decline" data-action="decline" data-id="${booking.booking_id}">Decline</button></div>` : ""}</article>`).join(""); }
+function renderBookings() { document.getElementById("pending-count").textContent = bookings.filter((booking) => booking.booking_status === "pending").length || ""; document.getElementById("booking-list").innerHTML = bookings.map((booking) => `<article class="booking"><div><span class="tag status-${booking.booking_status}">${booking.booking_status}</span><h2>${booking.title}</h2><p>${booking.customer} · ${booking.date}</p></div>${booking.booking_status === "pending" ? `<div class="booking-actions"><button class="primary" data-action="confirm" data-id="${booking.booking_id}">Accept</button><button class="secondary decline" data-action="decline" data-id="${booking.booking_id}">Decline</button></div>` : ""}</article>`).join(""); }
 function getSlots() { return [...document.querySelectorAll(".availability-row")].map((row) => { const date = row.querySelector(".avail-date").value; const time = row.querySelector(".avail-time").value; return date && time ? `${date}T${time}:00Z` : ""; }).filter(Boolean); }
 function validate(data) { const errors = []; if (!SERVICE_CATEGORIES.includes(data.service_type)) errors.push("Choose cleaning, handyman, moving, or custom."); if (!data.title.trim()) errors.push("Title is required."); if (!Number.isFinite(data.hourly_rate) || data.hourly_rate <= 0) errors.push("Hourly rate must be a positive number."); if (!data.availability_slots.length) errors.push("Add at least one availability date and time."); return errors; }
 document.querySelectorAll("nav button").forEach((button) => button.addEventListener("click", () => showView(button.dataset.view)));
