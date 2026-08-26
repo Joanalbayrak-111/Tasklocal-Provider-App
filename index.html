@@ -6,19 +6,22 @@
 <title>TaskLocal | Provider workspace</title>
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
 <style>
-  :root { --ink: #1f2320; --muted: #52564f; --paper: #faf9f7; --surface: #ffffff; --line: #e4e1db; --green: #2f6b4f; --green-dark: #244f3b; --mint: #e7f0ea; --orange: #d9714a; --yellow: #fff2d9; --blue: #dcecff; --blue-ink: #17509c; --success: #e2f4e5; --success-ink: #1f7a34; --danger: #b3261e; --radius: 10px; }
+  :root { --ink: #1f2320; --muted: #52564f; --paper: #faf9f7; --surface: #ffffff; --line: #e4e1db; --green: #2f6b4f; --green-dark: #244f3b; --mint: #e7f0ea; --orange: #d9714a; --yellow: #fff2d9; --blue: #dcecff; --blue-ink: #17509c; --success: #e2f4e5; --success-ink: #1f7a34; --danger: #b3261e; --nav-bg: #2f6b4f; --nav-copy: #e1eee6; --radius: 10px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #ede9e4; --muted: #b7bab2; --paper: #17181a; --surface: #212328; --line: #34373d; --green: #6bc79a; --green-dark: #86d6ac; --mint: #223129; --orange: #d9714a; --yellow: #4a3a12; --blue: #17293f; --blue-ink: #8ec2ff; --success: #1c3624; --success-ink: #85dba3; --danger: #ff8a80; --nav-bg: #1d4433; --nav-copy: #d1e6d8; }
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color-scheme: light dark; }
   button, input, select, textarea { font: inherit; }
   .app { display: flex; min-height: 100vh; }
-  aside { position: relative; width: 255px; padding: 28px 20px; background: var(--green); color: #fff; }
+  aside { position: relative; width: 255px; padding: 28px 20px; background: var(--nav-bg); color: #fff; }
   .brand { display: flex; align-items: center; gap: 10px; margin: 0 0 48px; font-size: 18px; font-weight: 700; }
   .brand img { width: 42px; height: 42px; border-radius: 8px; background: #f7f1e3; }
   .brand-copy { display: block; }
   .brand span { display: block; margin-top: 3px; color: #c8ded0; font-size: 11px; font-weight: 500; letter-spacing: .4px; }
   nav { display: grid; gap: 5px; }
-  nav button { display: block; width: 100%; padding: 11px 12px; border: 0; border-radius: 8px; color: #e1eee6; background: transparent; text-align: left; cursor: pointer; }
-  nav button.active, nav button:hover { color: #244f3b; background: #e7f0ea; }
+  nav button { display: block; width: 100%; padding: 11px 12px; border: 0; border-radius: 8px; color: var(--nav-copy); background: transparent; text-align: left; cursor: pointer; }
+  nav button.active, nav button:hover { color: var(--green-dark); background: var(--mint); }
   .profile { position: absolute; right: 20px; bottom: 28px; left: 20px; color: #c8ded0; font-size: 13px; }
   .profile strong { display: block; margin-bottom: 3px; color: white; }
   main { width: min(960px, 100%); padding: 52px clamp(24px, 6vw, 76px); }
