@@ -102,12 +102,36 @@
     </section>
   </main>
 </div>
-<script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.112.3";
+
+// Same shared TaskLocal project the other three products use. This is the
+// public anon/publishable key, safe to expose here -- access is enforced by
+// the shared database's Row Level Security policies, not by hiding this key.
+const supabase = createClient(
+  "https://bikimbnqtvbqzprfgzfj.supabase.co",
+  "sb_publishable_C5VQy9h0OV5LSSCsKqoneQ_R3RaN59S"
+);
+
 const SERVICE_CATEGORIES = ["cleaning", "handyman", "moving", "custom"];
+// Stand-in for real provider login, which this app doesn't have yet -- every
+// listing created here is attributed to this fixed provider_id.
+//
+// Reading listings below is wired to the real shared database: listings
+// are meant to be public, so that's safe with just this anon key. Creating
+// a listing and reading/updating bookings are both intentionally still
+// local mock data -- the shared database's insert policy for listings and
+// its read policy for bookings both require a real authenticated provider
+// (auth.uid()), which this app has no way to prove without a real login
+// system. The alternative -- a policy permissive enough to let any visitor
+// create listings or read every booking -- is the exact vulnerability
+// already found and closed once on this project. Wiring those two live
+// needs real provider auth first, not a shortcut around it.
 const PROVIDER_ID = "prov_88301";
-let listings = [{ listing_id: "lst_482913", provider_id: PROVIDER_ID, title: "Deep Apartment Cleaning", service_type: "cleaning", description: "A detailed reset for kitchens, bathrooms, and living spaces.", hourly_rate: 45, availability_slots: ["2026-08-20T09:00:00Z"] }];
+let listings = [];
 let bookings = [{ booking_id: "bkg_10932", title: "Move-out clean", customer: "Jamie R.", booking_status: "pending", date: "Aug 28, 2026" }, { booking_id: "bkg_10918", title: "Kitchen cabinet repair", customer: "Priya S.", booking_status: "confirmed", date: "Aug 26, 2026" }, { booking_id: "bkg_10877", title: "Two-bedroom move", customer: "Chris T.", booking_status: "completed", date: "Aug 18, 2026" }];
 function randomDigits(count) { return Array.from({ length: count }, () => Math.floor(Math.random() * 10)).join(""); }
+async function loadListings() { const { data, error } = await supabase.from("listings").select("listing_id, provider_id, title, service_type, description, hourly_rate, availability_slots").eq("provider_id", PROVIDER_ID); if (!error && data) listings = data; renderListings(); }
 function showView(name) { document.querySelectorAll(".view").forEach((view) => view.classList.toggle("visible", view.id === name + "-view")); document.querySelectorAll("nav button").forEach((button) => button.classList.toggle("active", button.dataset.view === name)); }
 function renderListings() { const grid = document.getElementById("listing-grid"); grid.innerHTML = listings.length ? listings.map((listing) => `<article class="listing"><span class="tag">${listing.service_type}</span><span class="status">Active</span><h2>${listing.title}</h2><p class="rate">$${listing.hourly_rate.toFixed(2)} <small>/ hour</small></p></article>`).join("") : '<div class="empty">You have no listings yet.</div>'; }
 function renderBookings() { document.getElementById("pending-count").textContent = bookings.filter((booking) => booking.booking_status === "pending").length || ""; document.getElementById("booking-list").innerHTML = bookings.map((booking) => `<article class="booking"><div><span class="tag status-${booking.booking_status}">${booking.booking_status}</span><h2>${booking.title}</h2><p>${booking.customer} · ${booking.date}</p></div>${booking.booking_status === "pending" ? `<div class="booking-actions"><button class="primary" data-action="confirm" data-id="${booking.booking_id}">Accept</button><button class="secondary decline" data-action="decline" data-id="${booking.booking_id}">Decline</button></div>` : ""}</article>`).join(""); }
@@ -117,8 +141,13 @@ document.querySelectorAll("nav button").forEach((button) => button.addEventListe
 document.getElementById("add-slot").addEventListener("click", () => { const row = document.querySelector(".availability-row").cloneNode(true); row.querySelectorAll("input").forEach((input) => { input.value = ""; }); document.getElementById("availability-list").appendChild(row); });
 document.getElementById("availability-list").addEventListener("click", (event) => { if (event.target.classList.contains("remove-slot") && document.querySelectorAll(".availability-row").length > 1) event.target.closest(".availability-row").remove(); });
 document.getElementById("listing-form").addEventListener("submit", (event) => { event.preventDefault(); const data = { service_type: document.getElementById("service_type").value, title: document.getElementById("title").value, description: document.getElementById("description").value, hourly_rate: Number(document.getElementById("hourly_rate").value), availability_slots: getSlots() }; const errors = validate(data); const errorBox = document.getElementById("form-errors"); errorBox.querySelector("ul").innerHTML = errors.map((error) => `<li>${error}</li>`).join(""); errorBox.hidden = !errors.length; document.getElementById("success-message").hidden = true; if (errors.length) return; const listing = { listing_id: `lst_${randomDigits(6)}`, provider_id: PROVIDER_ID, title: data.title.trim(), service_type: data.service_type, description: data.description.trim(), hourly_rate: Number(data.hourly_rate.toFixed(2)), availability_slots: data.availability_slots }; listings.push(listing); renderListings(); document.getElementById("success-message").hidden = false; event.target.reset(); showView("listings"); });
+// Creating a listing intentionally still isn't wired to Supabase: the
+// shared database's insert policy for listings requires a real
+// authenticated provider (auth.uid()), same gap as bookings above. Local
+// data source, though, is real Supabase now, so any listing this app or
+// a database admin already added for prov_88301 will show up above.
 document.getElementById("booking-list").addEventListener("click", (event) => { const action = event.target.dataset.action; if (!action) return; const bookingId = event.target.dataset.id; if (action === "confirm") bookings.find((booking) => booking.booking_id === bookingId).booking_status = "confirmed"; else bookings = bookings.filter((booking) => booking.booking_id !== bookingId); renderBookings(); });
-renderListings(); renderBookings();
+loadListings(); renderBookings();
 </script>
 </body>
 </html>
